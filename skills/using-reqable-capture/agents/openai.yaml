@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reqable Capture"
+  short_description: "Locate HTTP traffic with Reqable MCP"
+  default_prompt: "Use Reqable MCP to capture and inspect the relevant HTTP request."
