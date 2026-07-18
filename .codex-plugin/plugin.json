@@ -1,0 +1,32 @@
+{
+  "name": "mxp-xc",
+  "version": "0.1.0",
+  "description": "Reusable coding-agent skills and workflows maintained by mxp-xc.",
+  "author": {
+    "name": "mao xin chen",
+    "url": "https://github.com/mxp-xc"
+  },
+  "homepage": "https://github.com/mxp-xc/agents",
+  "repository": "https://github.com/mxp-xc/agents",
+  "keywords": [
+    "skills",
+    "workflows",
+    "coding-agents"
+  ],
+  "interface": {
+    "displayName": "MXP-XC",
+    "shortDescription": "Reusable coding-agent skills and workflows.",
+    "longDescription": "Skills for code simplification, coordination, UI prototyping, iterative refinement, and HTTP capture analysis.",
+    "developerName": "mxp-xc",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/mxp-xc/agents",
+    "defaultPrompt": [
+      "Help me choose and use an MXP-XC skill."
+    ]
+  }
+}
