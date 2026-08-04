@@ -1,0 +1,44 @@
+engagement:
+  id: ENG-2026-001
+  authorization_ref: signed-roe-001
+  owner: security-team
+  environment: staging
+  starts_at: "2026-08-04 09:00:00"
+  ends_at: "2026-08-04 18:00:00"
+
+scope:
+  include:
+    - app.staging.example.com
+    - 10.20.30.0/28
+  exclude:
+    - app.staging.example.com/logout
+    - 10.20.30.10
+  operator_controlled_callbacks:
+    - 10.99.0.5
+
+rules:
+  allowed:
+    - reconnaissance
+    - authenticated_web_testing
+    - non_destructive_exploit_validation
+  require_approval:
+    - account_creation
+    - state_mutation
+    - callback_shell
+  forbidden:
+    - denial_of_service
+    - persistence
+    - data_exfiltration
+    - third_party_targets
+  max_requests_per_second: 5
+
+stop_conditions:
+  - target_outside_allowlist
+  - production_data_detected
+  - service_health_degraded
+  - authorization_window_expired
+
+evidence:
+  raw_logs: required
+  command_receipts: required
+  finding_requires_tool_evidence: true
