@@ -1,0 +1,21 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "agents",
+  "description": "Reusable coding-agent skills and workflows maintained by mxp-xc — code check, simplifier, coordinator, frontend prototype, refine, Reqable capture.",
+  "owner": {
+    "name": "mao xin chen",
+    "email": ""
+  },
+  "plugins": [
+    {
+      "name": "mxp-xc",
+      "description": "Reusable coding-agent skills and workflows: code check, simplifier, coordinator, frontend prototype companion, refine, and Reqable capture analysis.",
+      "version": "0.1.0",
+      "source": "./",
+      "author": {
+        "name": "mao xin chen",
+        "url": "https://github.com/mxp-xc"
+      }
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "代码检查"
+  short_description: "全面检查并验证代码中的正确性、安全性、性能、日志、依赖与结构问题"
+  default_prompt: "使用 $code-check 检查指定代码并报告经过验证的问题，不要修改代码。"
