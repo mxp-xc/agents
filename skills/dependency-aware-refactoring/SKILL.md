@@ -1,6 +1,7 @@
 ---
 name: dependency-aware-refactoring
 description: Use when refactoring architecture, extracting modules/components/adapters, or considering third-party libraries during code cleanup; especially when package quality, community activity, best practices, low-value wrappers, or further-refactor cost/benefit are in question.
+disable-model-invocation: true
 ---
 
 # Dependency-Aware Refactoring

@@ -1,6 +1,7 @@
 ---
 name: using-reqable-capture
 description: Use when a task mentions Reqable, HTTP capture, proxy traffic.
+disable-model-invocation: true
 ---
 
 # Using Reqable Capture
