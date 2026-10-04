@@ -10,6 +10,7 @@
 
 ## 目录职责
 
+- `instructions/`: 个人通用指令的唯一内容来源，通过软链接供各客户端作为全局指令读取。
 - `skills/`: 可复用技能说明。
 - `agents/`: 专用 agent 角色和协作协议。
 - `commands/`: 可直接调用的 workflow 命令。
