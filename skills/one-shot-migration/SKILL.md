@@ -1,6 +1,6 @@
 ---
 name: one-shot-migration
-description: 迁移策略——代码只保留最终形态，存量数据用 temp/ 一次性脚本刷库，仓库不留迁移/兼容代码。
+description: Keep application code in its final form and migrate existing data with one-off scripts under temp/, without permanent migration or compatibility code.
 disable-model-invocation: true
 ---
 

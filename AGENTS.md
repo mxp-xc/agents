@@ -1,12 +1,6 @@
 # Agent 使用规范
 
-本仓库用于维护个人 agents workflow 能力。对用户可见内容使用中文；代码标识符、命令和技术名词保留原文。
-
-## 工作区
-
-- 保护用户和协作者已有改动，不修改无关文件。
-- 未经明确审批，不执行 `git commit`、`git push`、`git reset --hard`、`git clean`、切分支或创建 worktree。
-- 提交或推送前先检查 `git status --short` 和 diff，只处理本次任务相关文件。
+本仓库用于维护个人 agents workflow 能力。
 
 ## 目录职责
 
@@ -18,6 +12,7 @@
 
 ## 内容原则
 
+- Skill 的 `SKILL.md` frontmatter 中 `description`，以及 `agents/openai.yaml` 的全部 UI 文案（包括 `display_name`、`short_description`、`default_prompt`）使用英文；正文使用中文。
 - 文档只写当前事实，不写历史沿革。
 - 保持轻量，先用 Markdown 记录核心约定，不提前引入复杂脚本或生成流程。
 - 新增内容应包含适用场景、输入、输出、约束和验证方式。

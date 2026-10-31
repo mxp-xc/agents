@@ -1,0 +1,4 @@
+interface:
+  display_name: "Refactor Advisor"
+  short_description: "Assess refactoring opportunities and verify findings"
+  default_prompt: "Use $refactor-advisor to assess refactoring opportunities in the specified code. First list available review areas for me to choose from and offer preliminary analysis with recommendations. Do not modify files."
