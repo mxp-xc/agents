@@ -8,7 +8,12 @@
 - `skills/`: 可复用技能说明。
 - `agents/`: 专用 agent 角色和协作协议。
 - `commands/`: 可直接调用的 workflow 命令。
+- `docs/`: 按仓库目录和主题组织的能力介绍、维护约定和限制，入口见[文档索引](docs/README.md)。
 - `learning/`: 隔离的调研、选型和方法学习笔记，不参与能力发现与执行。
+
+## 维护入口
+
+维护能力前，通过文档索引查阅对应说明；修改 `skills/` 时，同时读取 [Skill 通用维护约定](docs/skills/README.md)。
 
 ## 内容原则
 
