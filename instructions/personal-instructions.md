@@ -39,6 +39,7 @@
 - RTK：Shell 命令默认直接使用 `rtk <cmd> [args...]`；RTK 会自动透传未知命令，无需预先检查是否有对应子命令。仅在需要确认具体用法或参数时查询 `--help`。
 - 仅当任务确需未经筛选的完整输出，或实际执行确认 RTK 包装存在兼容问题时，使用 `rtk proxy <cmd> [args...]`。
 - `Glob`/`Grep` 禁止直接扫描 `/` 或 `~`。
+- 开发 CLI 应用时，默认优先沿用项目现有技术栈；有 Python 依赖时，优先采用 Python + Typer。
 - Python 用 `uv`：运行用 `uv run`，添加依赖用 `uv add`，一次性代码用 `uv run python -c "..."`，临时依赖用 `uv run --with <pkg> python -c "..."`。
 - Python 项目 CLI 优先注册命令入口，日常命令使用 `uv run <命令>`。隔离分析、固定解释器或禁止同步等场景按需添加参数，并说明用途；日常入口不默认添加 `--no-sync`、`--no-project` 或 `--no-python-downloads`。
 - JS/TS 用 `bun` 执行和管理依赖；业务代码保持 Node.js 兼容，使用 Node 包和 Vitest，除 bun 专属项目或启动入口外禁用 `bun:test`、`Bun.*`。
