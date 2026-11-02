@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "agents",
-  "description": "Reusable coding-agent skills and workflows maintained by mxp-xc: refactoring advice and Reqable capture.",
+  "description": "Reusable coding-agent skills and workflows maintained by mxp-xc: development coordination, refactoring advice, and Reqable capture.",
   "owner": {
     "name": "mao xin chen",
     "email": ""
@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "mxp-xc",
-      "description": "Reusable coding-agent skills and workflows: refactoring advice and Reqable capture analysis.",
+      "description": "Reusable coding-agent skills and workflows: development coordination, refactoring advice, and Reqable capture analysis.",
       "version": "0.2.0",
       "source": "./",
       "author": {

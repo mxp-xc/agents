@@ -1,0 +1,7 @@
+interface:
+  display_name: "Orchestrate Development"
+  short_description: "Coordinate development through autonomous subagents"
+  default_prompt: "Use $orchestrate-development to coordinate this development task through autonomous subagents, monitor progress, and organize integration and acceptance."
+
+policy:
+  allow_implicit_invocation: false
