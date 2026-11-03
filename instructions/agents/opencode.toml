@@ -1,0 +1,3 @@
+[target]
+output = "~/.config/opencode/AGENTS.md"
+test_output = "generated/opencode/AGENTS.md"

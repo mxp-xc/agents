@@ -1,0 +1,3 @@
+[target]
+output = "~/.dsh/AGENTS.md"
+test_output = "generated/dsh/AGENTS.md"

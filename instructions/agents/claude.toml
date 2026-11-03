@@ -1,0 +1,3 @@
+[target]
+output = "~/.claude/CLAUDE.md"
+test_output = "generated/claude/CLAUDE.md"

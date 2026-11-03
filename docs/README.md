@@ -11,6 +11,7 @@
 
 ## 维护说明
 
+- [个人指令维护说明](instructions/README.md)：公共模板、target 配置、生成检查与全局指令迁移。
 - [Skill 通用维护约定](skills/README.md)：所有 skill 的独立分发与资源引用边界。
 - [refactor-advisor](skills/refactor-advisor.md)：领域与公共资源的划分、引用方向、扩展边界和验证要求。
 - [orchestrate-development](skills/orchestrate-development.md)：开发协调流程、正式版本与草案的维护边界、实现入口和验证要求。
