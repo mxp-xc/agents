@@ -54,8 +54,7 @@
 - 日期时间默认使用上海时区（`Asia/Shanghai`），格式为 `YYYY-MM-DD HH:MM:SS`，可按所需精度从开头截取，如 `YYYY-MM-DD`、`YYYY-MM`。外部 API 或协议有明确要求时，遵循接口约定。
 
 ## 工具与临时文件
-
-- RTK：Shell 命令默认直接运行 `rtk <cmd> [args...]`（未知命令会自动透传，无需预检子命令；仅在需确认参数时查 `--help`）。确需完整原始输出或实测存在兼容问题时，改用 `rtk proxy <cmd> [args...]` 并说明原因。
+{{ rtk.instructions }}
 - `Glob`/`Grep` 禁止直接扫描 `/` 或 `~`。
 - 开发 CLI 应用时，默认优先沿用项目现有技术栈；有 Python 依赖时，优先采用 Python + Typer。
 - Python 用 `uv`：运行用 `uv run`，添加依赖用 `uv add`，一次性代码用 `uv run python -c "..."`，临时依赖用 `uv run --with <pkg> python -c "..."`。

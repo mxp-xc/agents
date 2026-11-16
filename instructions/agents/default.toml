@@ -3,3 +3,6 @@ value = ""
 
 [github.tools]
 value = ""
+
+[rtk.instructions]
+value = ""

@@ -4,3 +4,7 @@ test_output = "generated/codex/AGENTS.md"
 
 [github.tools]
 value = "- 处理 GitHub 任务时，优先调用 `github` 技能库工具，不可用时回退至 `gh` CLI。"
+
+# 值开头的 \n 补齐模板中省去的空行，使 codex 在标题与列表之间保留空行；其余 target 值为空时不产生多余空行。
+[rtk.instructions]
+value = "\n- RTK：Shell 命令默认直接运行 `rtk <cmd> [args...]`（未知命令会自动透传，无需预检子命令；仅在需确认参数时查 `--help`）。确需完整原始输出或实测存在兼容问题时，改用 `rtk proxy <cmd> [args...]` 并说明原因。"
