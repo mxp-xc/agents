@@ -33,7 +33,7 @@ value = """## T3 Code
 3. 前端开发任务，确认目标仓库和适用规则后直接委派。由子 agent 定位代码、实现和验证，主 agent 负责验收。
    - 同一任务的后续修改、补充或返工，优先交给原子 agent 继续处理。独立任务或原子 agent 无法续接时，新开委派。
 
-子 agent 主动向父 agent 传消息时，用 `t3_thread_send` 并传父线程的 `threadId`（`mode` 选 `steer` 打断正在执行的一轮，`queue` 排队等下一轮）。T3 下父 agent 是委派方线程，不在 subagent 树里，`send_message` 送不到。
+线程间传消息用接收方能直接收到的通道：同一 harness 优先走原生子 agent 机制，例如codex 发给 codex 直接用原生；当前 harness 没有原生子 agent 能力，或跨 harness 发送（例如codex 发给 claude），才用 `t3_thread_send` 传目标线程的 `threadId`，`mode` 优先 `steer` 打断正在执行的一轮；`queue` 排队等下一轮，父 agent 长时间运行时可能一直收不到。父 agent 要主动用 `t3_thread_read` 收取子 agent 回传，不要只等自动送达。
 
 ### 跨线程回复
 
