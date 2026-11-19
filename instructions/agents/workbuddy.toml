@@ -1,0 +1,3 @@
+[target]
+output = "~/.workbuddy/CODEBUDDY.md"
+test_output = "generated/workbuddy/CODEBUDDY.md"

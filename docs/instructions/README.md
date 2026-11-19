@@ -6,7 +6,11 @@
 
 ## 当前维护入口
 
-四个 harness 的全局指令均读取生成的普通文件。公共规则维护在 `instructions/template.md`，专属规则维护在对应的 target TOML；“回复风格”和“GitHub 工具”由 Codex 配置提供，其他 target 默认不生成。修改源文件后先预览，再运行 `uv run agentctl instructions sync --all` 并检查结果。
+五个 harness 的全局指令均读取生成的普通文件。公共规则维护在 `instructions/template.md`，专属规则维护在对应的 target TOML；“回复风格”和“GitHub 工具”由 Codex 配置提供，其他 target 默认不生成。修改源文件后先预览，再运行 `uv run agentctl instructions sync --all` 并检查结果。
+
+T3 Code 相关规则由 `{{ t3.instructions }}` 提供，默认值放在 `default.toml`，对所有 target 生效，内容自身限定仅在 T3 Code 会话中适用；target 需要差异化时再覆盖。
+
+WorkBuddy 桌面端通过内置 CodeBuddy CLI 读取 `~/.workbuddy/CODEBUDDY.md`，该文件是用户级全局指令；桌面端的“记忆”使用 `~/.workbuddy/memory/`，与个人指令不是同一套内容。
 
 模板本身决定组合顺序；当前先放公共规则，末尾 `{{ harness.instructions }}` 放专属规则。生成文件直接包含替换后的 Markdown。成对的 `{{ ... }}` 中，去除两端空白后的完整文本是 key；其他内容原样保留，TOML 值也不会递归解析。未配对的 `{{`、单独的 `}}` 及 `{% ... %}` 视为普通文本；空 key 报错。配置值应写成可独立插入当前位置的完整 Markdown，避免破坏标题和列表结构。公共规则保持通用，专属规则只补充适用范围或明确说明差异；若存在冲突，文件中出现的先后顺序不保证改变各 harness 的指令优先级。
 
@@ -59,6 +63,6 @@ uv run python -m unittest discover -s tests -v
 2. 用户确认迁移方案后，备份现有链接和文件；确认各 target 中的正式路径，使用带 `--force` 的 dry-run 预览目标和内容，再明确执行。
 3. 检查生成文件及 harness 的实际加载行为，必要时从备份恢复。
 
-本工具不会自动接入启动流程；如有需要，可由用户在确认启动方式和失败处理后自行选择性调用。当前三个已核查的 Codex、Claude Code 和 OpenCode 全局指令路径不由 chezmoi 管理，chezmoi 另管理 OpenCode 配置。若将来选择由 chezmoi 管理生成结果，应先审查 source 和 apply 的覆盖行为并单独确定迁移方案；本工具不会修改 chezmoi。
+本工具不会自动接入启动流程；如有需要，可由用户在确认启动方式和失败处理后自行选择性调用。当前已核查的 Codex、Claude Code、DeepSeek harness、OpenCode 和 WorkBuddy 全局指令路径不由 chezmoi 管理，chezmoi 另管理 OpenCode 配置。若将来选择由 chezmoi 管理生成结果，应先审查 source 和 apply 的覆盖行为并单独确定迁移方案；本工具不会修改 chezmoi。
 
 模板保留的 `@/Users/maoxinchen/.codex/RTK.md` 是原指令中的外部引用，工具不会展开它；迁移到其他机器或 harness 前需确认目标环境及 harness 对该引用的支持。

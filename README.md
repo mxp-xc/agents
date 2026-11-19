@@ -29,6 +29,7 @@
 | Claude Code | `~/.claude/CLAUDE.md` |
 | DeepSeek harness | `~/.dsh/AGENTS.md` |
 | OpenCode | `~/.config/opencode/AGENTS.md` |
+| WorkBuddy | `~/.workbuddy/CODEBUDDY.md` |
 
 修改源文件后重新运行同步；启动新会话以加载最新指令。
 通用指令保留 `@/Users/maoxinchen/.codex/RTK.md` 引用，该文件独立维护并需保留在原路径。

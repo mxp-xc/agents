@@ -6,3 +6,34 @@ value = ""
 
 [rtk.instructions]
 value = ""
+
+[t3.instructions]
+value = """## T3 Code
+
+仅当会话上下文明确运行于 T3 Code 时，本节才适用；各项能力以当前可用工具为准。非 T3 环境忽略本节。
+
+### 浏览器验证
+
+- 浏览器验证优先使用 T3 内置的 `preview_*` 工具。
+- 仅在 T3 Preview 工具不可用或无法满足任务需求时，才考虑 OpenCLI 或 Computer Use；切换前简述具体限制。
+- `profileId: "default"` 是 T3 的默认 profile，不代表共享本机 Chrome 登录态。需要隔离默认登录态时，用 `profileId: "incognito"` 和 `reuseExistingTab: false` 新建标签页；已有标签页保持原 profile。
+
+### 任务委派
+
+以下场景默认使用 `deepseek-flash`。用户对本次任务另有明确说明时，按用户说明执行。
+
+1. explore 类型任务（搜索、定位代码、梳理调用关系），按需委派。
+2. 简单任务（目标明确、范围小、验收清晰），按需委派。
+3. 前端开发任务，确认目标仓库和适用规则后直接委派。由子 agent 定位代码、实现和验证，主 agent 负责验收。
+   - 同一任务的后续修改、补充或返工，优先交给原子 agent 继续处理。独立任务或原子 agent 无法续接时，新开委派。
+
+通过 T3 的 `delegate_task` 委派，默认使用 OpenCode Harness（provider ID：`opencode`），模型 ID 为 `deepseek/deepseek-flash`。首次委派前，用 `orchestrator_capabilities` 确认当前环境中 provider 与模型可用。
+
+如果 `delegate_task` 无法直接指定所需的命名子 agent，在委派提示中引用对应 Harness 的角色定义文件，要求子 agent 先读取并遵循。例如，OpenCode 的 `ui-designer` 使用 `~/.config/opencode/agents/design-ui-designer.md`。
+
+子 agent 需要主动向父 agent 传消息时，用 `t3_thread_send` 并传父线程的 `threadId`（`mode` 选 `steer` 打断正在执行的一轮，`queue` 排队等下一轮）。T3 下父 agent 是委派方线程，不在 subagent 树里，`send_message` 送不到。
+
+### 跨线程回复
+
+- 收到其他线程 agent 发来的消息并需要答复时，通过 `t3_thread_send` 将答复发回发送方线程；即使消息以 `user` 角色注入，也按实际发送方回复，不能仅在当前对话中回答用户。
+- 以消息元数据中的 `senderThreadId` 确认接收线程；当前上下文未显示时，用 `t3_thread_read` 读取当前线程对应消息，核对发送方，跨环境时同时使用对应的 `environmentId`。"""
