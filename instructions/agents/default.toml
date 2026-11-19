@@ -22,7 +22,7 @@ value = """## T3 Code
 
 子任务默认用当前 harness 的原生子 agent 工具派发（如 OpenCode 的 `subagent`、Claude Code 的 `Agent`、Codex 的 `spawn_agent`）。
 
-仅当需要派遣到其他 harness 时，才用 T3 的 `delegate_task`；首次委派前用 `orchestrator_capabilities` 确认当前环境中 provider 与模型可用。
+仅当需要派遣到其他 harness、不同 provider 或不同模型时，才用 T3 的 `delegate_task`；首次委派前用 `orchestrator_capabilities` 确认当前环境中 provider 与模型可用。例如 codex/sol 线程要派 `deepseek-flash` 子任务：`delegate_task` 传 `target.model = "deepseek/deepseek-flash"`。
 
 `delegate_task` 无法直接指定命名子 agent 时，在委派提示中引用对应 Harness 的角色定义文件，要求子 agent 先读取并遵循；如 OpenCode 的 `ui-designer` 对应 `~/.config/opencode/agents/design-ui-designer.md`。
 
