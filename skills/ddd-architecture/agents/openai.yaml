@@ -1,0 +1,7 @@
+interface:
+  display_name: "DDD Architecture"
+  short_description: "Bootstrap pragmatic DDD boundaries, coding standards, and architecture guardrails"
+  default_prompt: "Use $ddd-architecture to establish pragmatic DDD boundaries, generate CODING_STANDARDS.md, wire automated architecture guardrails, and build a walking skeleton."
+
+policy:
+  allow_implicit_invocation: true
