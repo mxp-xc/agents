@@ -8,7 +8,7 @@
 
 - **自主触发（model-invoked）**：面向新建项目、新增独立业务模块或**尚未上线/早期开发阶段**需要结构整改的场景；不设置 `disable-model-invocation: true`，由全局指令指针或模型自主判断触发。
 - **与 `project-structure` 的边界**：`project-structure` 聚焦纯目录骨架与文件摆放（用户手动触发）；`ddd-architecture` 负责务实 DDD 分层边界、技术栈关键选型拍板、落盘 `CODING_STANDARDS.md`、接入机械架构护栏（ArchUnit / ESLint + dependency-cruiser / import-linter）并交付标杆垂直切片。
-- **维护保留原则**：保留按“运行阶段（未上线 vs 已上线）”判定演进自由度的步骤、L1（默认）/ L2 两档梯度区分、4 步落盘闭环与受限环境降级策略。
+- **维护保留原则**：保留按“运行阶段（未上线 vs 已上线）”判定演进自由度的步骤、L1（默认）/ L2 两档梯度区分、通用依赖边界原则与按生态特化展平策略（Java/Node 保留 `modules/` 收拢业务并展平横切及 `types/{enums,vo,dto}`、`utils/`；Python 参考 `fastapi-fullstack` 采用轻量务实展平分层）、4 步落盘闭环与受限环境降级策略。
 
 ## 目录职责
 
@@ -16,7 +16,7 @@
 | --- | --- |
 | [SKILL.md](../../skills/ddd-architecture/SKILL.md) | 触发语义、5 步工作流及完成标准、通用架构红线、约束与降级策略 |
 | [references/index.md](../../skills/ddd-architecture/references/index.md) | 参考文件导航、必读与按栈读取顺序、扩展约定 |
-| [references/ddd-tactical-guide.md](../../skills/ddd-architecture/references/ddd-tactical-guide.md) | 语言无关四层职责、分包策略、L1/L2 梯度、规则机制选型表、未上线整改 vs 已上线演进、反过度设计清单 |
+| [references/ddd-tactical-guide.md](../../skills/ddd-architecture/references/ddd-tactical-guide.md) | 语言无关四层职责、全局二分边界与按栈展平策略、L1/L2 梯度、规则机制选型表、未上线整改 vs 已上线演进、反过度设计清单 |
 | [references/coding-standards-template.md](../../skills/ddd-architecture/references/coding-standards-template.md) | 落盘至目标仓库根目录的 `CODING_STANDARDS.md` 模板 |
 | [references/*.md](../../skills/ddd-architecture/references/) | 各语言/框架特化落地方案与机械护栏模板（当前含 `java-spring.md`、`typescript-web.md`、`python.md`） |
 | [agents/openai.yaml](../../skills/ddd-architecture/agents/openai.yaml) | 展示名称、简述、默认提示词与 `allow_implicit_invocation: true` 策略 |

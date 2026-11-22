@@ -10,22 +10,28 @@ interfaces ──▶ application ──▶ domain ◀── infrastructure
 
 | 分层 | 核心职责 | 允许依赖 | 严禁出现 |
 | --- | --- | --- | --- |
-| `interfaces` | 对外协议入口（HTTP/RPC/CLI/MQ）、输入输出 DTO、格式与基础校验注解、协议结果包装 | `application`、`shared`（及同层 DTO） | 业务决策、事务开启、直接调用写路径持久层或 ORM 实体 |
-| `application` | 用例编排、事务边界、调用方身份权限校验、跨聚合协调、只读查询通道（Query） | `domain`、`shared`（读写分离时读模型可经查询端口） | 协议对象（HTTP Request/Response）、SQL 拼装细节 |
-| `domain` | 核心业务规则：聚合根与实体（状态流转与不变量）、值对象、强类型状态枚举、领域服务、领域异常、仓储接口/端口 | 标准库、`shared` 轻量领域基元 | Web 框架、HTTP 状态码、控制层 DTO、具体数据库实现 |
-| `infrastructure` | 仓储实现、ORM 映射与 SQL、外部网关客户端、鉴权中间件/Filter、全局异常转协议映射、集中配置装配 | `domain`、`application`（端口）、`shared`、第三方框架 | 反向 import `interfaces` 的请求/响应契约或控制器 |
+| `interfaces` | 对外协议入口（HTTP/RPC/CLI/MQ）、输入输出 DTO、格式与基础校验注解、协议结果包装 | `application`、无框架公共区（及同层 DTO） | 业务决策、事务开启、直接调用写路径持久层或 ORM 实体 |
+| `application` | 用例编排、事务边界、调用方身份权限校验、跨聚合协调、只读查询通道（Query） | `domain`、无框架公共区（读写分离时读模型可经查询端口） | 协议对象（HTTP Request/Response）、SQL 拼装细节 |
+| `domain` | 核心业务规则：聚合根与实体（状态流转与不变量）、值对象、强类型状态枚举、领域服务、领域异常、仓储接口/端口 | 标准库、无框架公共区 | Web 框架、HTTP 状态码、控制层 DTO、具体数据库实现、带框架横切目录 |
+| `infrastructure` | 仓储实现、ORM 映射与 SQL、外部网关客户端、持久化适配器 | `domain`、`application`（端口）、无框架公共区、第三方框架 | 反向 import `interfaces` 的请求/响应契约或控制器 |
 
-- **公共与配置目录**：`shared/`（或 `common/`）仅放跨上下文复用的时间基元、统一错误基类、请求追踪标识等稳定基础能力，禁止沦为业务杂物间；`config/` 集中管理框架装配、依赖注入与环境变量读取。
+- **全局目录二分边界（先分“有无框架依赖”，再按语言特化展平）**：
+  - **无框架公共区**（如后端展平的 `types/`、`utils/`、纯语义异常根包；前端的 `shared/`）：仅放零框架/IO 耦合的跨模块公共枚举、值对象、通用传值 DTO、语义异常基类与纯无状态工具；所有层（含 `domain`）可安全依赖，但**严禁反向依赖业务域或任何带框架横切目录**，且避免使用易沦为垃圾桶的 `common/` 命名。
+  - **带框架横切与装配区**（如各栈特化的 `config/`、`filters/`、`middlewares/`、`aop/`、`exceptions/handler/`、`persistence/`、`mq/`、`scheduler/`、`core/`、`app/` 等）：承载框架装配、鉴权/追踪/切面、协议异常映射、持久/MQ/调度基建；**`domain` 严禁依赖**，且彻底避免在顶层再建与模块内层重名的 `infrastructure/`。
 
-## 二、分包策略：默认模块化单体（先业务，后分层）
+## 二、分包策略：先保证边界清晰，再按语言生态展平
 
-1. **模块化单体（默认）**：
-   只要系统包含 **2 个及以上拥有独立生命周期、独立主表或独立职责边界的核心业务概念**（例如账号/身份、商品/资源目录、订单/交易等），一律采用模块化单体分包：顶层先按界限上下文（Bounded Context）垂直分包，每个上下文内部再分 `interfaces`、`application`、`domain`、`infrastructure` 四层；横跨上下文的基础设施与通用基元放在同级的 `shared/` 与 `config/`（或 `infrastructure/` 横切入口）。
+1. **模块化单体（Java / Node 后端等默认，先业务后分层）**：
+   只要系统包含 **2 个及以上拥有独立生命周期、独立主表或独立职责边界的核心业务概念**（例如账号/身份、商品/资源目录、订单/交易等），必须将全部业务域统一收拢在 **`modules/`**（前端收拢在 `features/`）下垂直分包，每个模块内部再分 `interfaces`、`application`、`domain`、`infrastructure` 四层；非业务横切与通用能力在根包按各语言参考惯例**直接展平**（如 `config/`、`filters/`、`aop/`、`exceptions/`、`types/`、`utils/`、`persistence/`），既不与业务包平铺混排，也不包多层冗余壳目录。
+   - **全局能力二分法**：判定一个非业务组件进无框架公共区还是带框架横切区，只需看是否依赖框架/协议/IO——零框架且 ≥2 个模块复用放 `types/`（含 `enums/`、`vo/`、`dto/`）或 `utils/`；含框架装配、拦截/切面、协议映射或持久/消息/调度基建放对应展平横切目录（如 `config/`、`filters/`、`aop/`、`exceptions/handler/`、`persistence/`）。
+   - **按需建目录、严禁单模块代码流入全局**：仅服务单一业务域的枚举、DTO、助手机制留在 `modules/<该域>/` 内部；当前没有对应需求时不预建空的 `aop/`、`mq/`、`utils/` 或 `types/` 子包。
    - **禁止合并展平**：禁止以“同属一个应用”或“初期体量不大”为由，把多域逻辑合并进单一上帝 `Controller`、`Service` 或 `Repository`/`Store`。
-   - **跨模块同事务协作原则**：业务模块间只允许通过目标模块 `application` 公开门面或领域事件协作；写操作依赖框架声明式事务传播共享同一数据库事务（如 Spring `@Transactional` 默认 `REQUIRED`），**严禁为了同事务而把多业务表揉进同一个全局存储实现，或直接穿透调用另一模块的 `infrastructure` / `domain` 内部实现**。
-   - **收益**：修改单一业务时上下文高度局部化；后续某个上下文需要独立部署时可直接整包抽离。
-2. **先分层，后业务（仅极窄场景切换）**：
-   仅当**用户明确指定**单聚合微型服务（全系统确实只有一个核心业务概念与核心主表）或采用 Maven/Gradle 物理多模块隔离编译依赖时，才在顶层直接划分 `interfaces/`、`application/`、`domain/`、`infrastructure/`。默认不省略顶层业务模块包。
+   - **跨模块同事务协作原则**：`modules/*` 间只允许通过目标模块 `application` 公开门面或领域事件协作；写操作依赖框架声明式事务传播共享同一数据库事务（如 Spring `@Transactional` 默认 `REQUIRED`），**严禁为了同事务而把多业务表揉进同一个全局存储实现，或直接穿透调用另一模块的 `infrastructure` / `domain` 内部实现**。
+   - **收益**：业务全收在 `modules/`、技术和通用能力一目了然且少一层嵌套点击；后续某个上下文需要独立部署时可直接整包抽离。
+2. **轻量务实展平分层（Python / FastAPI 等生态默认）**：
+   对于本身强调清晰水平分层的生态（如参考 `fastapi-fullstack` 实践的 FastAPI 服务），无需强套按域四层套娃，可直接按 `api/` → `services/` → `repositories/` → `db/` + `core/` / `schemas/` / `exceptions/` / `types/` / `utils/` 展平组织，仍坚守**单向依赖、契约分离、强类型枚举、语义异常与自动化导入护栏**；仅当业务复杂度飙升到需要物理隔离多个界限上下文（L2）时，再升级为按域独立拆包。
+3. **单域微型服务 / 物理多模块（极窄切换）**：
+   仅当**用户明确指定**单聚合微型服务（全系统确实只有一个核心业务概念与核心主表）或采用 Maven/Gradle 物理多模块隔离编译依赖时，模块化单体才可省去 `modules/<context>` 而直接划分为 `interfaces/`、`application/`、`domain/`、`infrastructure/`。默认不将多域业务逻辑揉成单一扁平上下文。
 
 ## 三、复杂度梯度：L1 轻量务实 vs L2 严格整洁
 

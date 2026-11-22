@@ -14,23 +14,25 @@
 - **当前运行阶段**：`<未上线早期开发 | 已上线运行中>`
 - **DDD 复杂度梯度**：`<L1 轻量务实 DDD | L2 严格六边形/整洁 DDD>`
 - **核心技术栈**：`<语言 / Web 框架 / ORM 或持久层 / 校验库 / 前端框架>`
-- **界限上下文划分**：
-  - `<context-a>`：<一句话职责边界>
-  - `<context-b>`：<一句话职责边界>
-  - `shared / config`：<跨模块公共基础能力与装配职责>
+- **业务与全局分工**：
+  - `<业务模块或服务域，如 modules/<context-a> 或 services/<domain-a>>`：<一句话职责边界>
+  - `<业务模块或服务域，如 modules/<context-b> 或 services/<domain-b>>`：<一句话职责边界>
+  - `<带框架横切目录，如 config / filters / aop / exceptions/handler / persistence 或 core>`：<框架装配、横切拦截、异常协议映射与公共 IO/持久基建职责>
+  - `<无框架公共区，如 types（enums/vo/dto）、utils、纯语义异常>`：<零框架共享枚举、值对象、通用传值 DTO、语义异常基类与通用工具职责>
 
 ## 2. 目录结构与依赖红线
 
 ```text
-<粘贴本仓库实际包/目录树及每层一句话职责>
+<粘贴本仓库实际包/目录树及每层/每个顶层目录一句话职责>
 ```
 
-**强制依赖方向**：`interfaces → application → domain ← infrastructure`
+**强制依赖方向**：`interfaces → application → domain ← infrastructure`（轻量分层架构为 `api → services → repositories → db`）
 
-- **严禁**：`domain` 依赖 `interfaces`、`application` 或 `infrastructure`（<标明 L1 下允许的轻量注解白名单，或 L2 下的零框架要求>）。
+- **严禁**：`domain`（或核心业务层）依赖 `interfaces`/`api`、`application`、`infrastructure`/`db` 或任何带框架横切目录（仅允许依赖标准库与无框架公共区，<另标明 L1 下允许的轻量注解白名单或 L2 零框架要求>）。
+- **严禁**：无框架公共区（`types`、`utils`、纯语义异常根包等）反向依赖业务模块或带框架横切目录。
 - **严禁**：`infrastructure` 反向引用 `interfaces`（包括控制器、请求/响应 DTO 与分页包装）。
 - **严禁**：`interfaces` 绕过 `application` 直接调用写路径持久化实现或操作数据库实体。
-- **跨上下文协作**：模块间通过各自 `application` 公开门面或领域事件协作，禁止直接查询或修改其他上下文的内部持久化表/实体。
+- **跨上下文协作**：`modules/*` 间仅通过各自 `application` 公开门面或领域事件协作，禁止直接查询或修改其他上下文的内部持久化表/实体，且禁止单模块私有辅助代码流入全局目录。
 
 ## 3. 契约、领域建模与异常规范
 

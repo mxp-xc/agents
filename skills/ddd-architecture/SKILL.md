@@ -27,14 +27,14 @@ description: Pragmatic Domain-Driven Design (DDD) architecture bootstrap, bounda
 
 2. **加载技术栈参考并输出 1 页架构蓝图**
    - 读取 [index.md](references/index.md)，按项目使用的语言与框架加载对应 `references/<stack>.md`（前后端或多端仓库分别读取）；尚未覆盖的技术栈按通用四层规则与该生态主流工程惯用法推导，并在蓝图中写明依据。
-   - 单体项目默认**先按业务模块垂直分包、模块内再分四层**；凡存在 **2 个及以上**独立生命周期的核心业务概念或主表，均须拆分为同构业务模块，禁止合并为单一上帝 Controller / Service / Repository；跨模块协作统一经对方 `application` 门面并依托声明式事务传播。
-   - 在 1 页架构蓝图中一次性拍板关键选型：持久层方案、声明式输入校验、集中鉴权与请求上下文入口、统一异常体系、强类型状态枚举策略、界限上下文分包与目录树、层间与模块间依赖红线。
+   - 遵循通用结构边界并按目标技术栈特化展平目录：根包禁止业务域与零散技术目录混排，也禁止顶层出现与业务模块内层重名的 `infrastructure/`；全局能力按“是否含框架/IO 依赖”清晰劈开无框架公共区（纯 `utils/`、跨处通用枚举/VO/传值 `types/`、纯语义异常）与带框架横切底座（配置、过滤器/中间件、切面、异常协议映射、持久/消息/调度基建）。多业务域模块化单体（如 Java / Node 后端）默认将业务域统一收拢在 `modules/`（前端收拢在 `features/`），模块内再分四层，非业务目录按该生态惯例展平于根包；Python（如 FastAPI）等生态优先采用 `references/python.md` 的轻量务实展平分层。禁止将多域逻辑合并进单一上帝 Controller / Service / Repository；跨模块协作统一经对方应用门面并依托声明式事务传播。
+   - 在 1 页架构蓝图中一次性拍板关键选型：持久层方案、声明式输入校验、集中鉴权与请求上下文入口、统一异常体系、强类型状态枚举策略、界限上下文或分层目录树、层间与模块间依赖红线。
    - 若技术栈未定或存在破坏性改动、重大架构取舍，先向用户简述蓝图并确认后再写代码；需求明确且已获授权的全新开发可直接落地蓝图并推进。
    - **完成标准**：蓝图包含目标目录树、依赖方向红线与关键技术选型，无悬而未决的架构冲突。
 
 3. **落盘规范与机械护栏**
    - 读取 [coding-standards-template.md](references/coding-standards-template.md)，结合本次蓝图在目标仓库根目录创建或更新 `CODING_STANDARDS.md`，使后续实现与代码审查有唯一可核对的架构准绳。
-   - 按对应技术栈参考接入自动化架构护栏（如 Java 的 ArchUnit / Checkstyle、TypeScript 的 ESLint 规则与 dependency-cruiser、Python 的 import-linter / ruff），护栏必须同时覆盖**四层依赖方向 + 跨模块隔离 + 无循环依赖**，并挂入项目默认测试或静态检查流程。
+   - 按对应技术栈参考接入自动化架构护栏（如 Java 的 ArchUnit / Checkstyle、TypeScript 的 ESLint 规则与 dependency-cruiser、Python 的 import-linter / ruff），护栏必须同时覆盖**层间依赖方向 + 领域/核心业务层不依赖框架横切目录 + 无框架公共区不反向依赖业务或框架目录 + 多模块隔离与无循环依赖**，并挂入项目默认测试或静态检查流程。
    - **完成标准**：`CODING_STANDARDS.md` 已落盘，架构护栏命令可执行且能拦截跨层、跨模块或反向依赖违规。
 
 4. **交付 1 个标杆垂直切片（Walking Skeleton）**
@@ -49,8 +49,8 @@ description: Pragmatic Domain-Driven Design (DDD) architecture bootstrap, bounda
 
 ## 通用架构红线
 
-- **依赖单向向内**：默认四层为 `interfaces → application → domain ← infrastructure`。`domain` 不得依赖外层协议、Web 框架或路由契约；`infrastructure` 不得反向依赖 `interfaces`；`interfaces` 不得绕过 `application` 直接调用写路径持久化实现。
-- **模块化单体跨模块边界**：多业务模块共存时，先按业务分包、模块内再分四层；模块间仅允许经对方 `application` 门面或领域事件协作，禁止绕过门面穿透对方 `domain`、`infrastructure` 或 `interfaces`，且禁止模块间循环依赖。
+- **依赖单向向内**：默认四层为 `interfaces → application → domain ← infrastructure`（轻量分层架构为 `api → services → repositories → db`）。`domain`（或核心业务层）仅可依赖标准库与无框架公共区（如 `types/`、`utils/`、纯语义异常），严禁依赖外层协议、Web 框架或带框架横切目录（如 `config/`、`filters/`、`middlewares/`、`aop/`、异常处理器、`persistence/`）；无框架公共区严禁反向依赖业务模块或框架目录；`infrastructure` 不得反向依赖 `interfaces`；`interfaces` 不得绕过应用层直接调用写路径持久化实现。
+- **顶层展平与跨模块边界**：具体顶层目录命名按各语言 `references/<stack>.md` 惯例展平组织（跨处通用枚举、值对象与传值 DTO 统一归口于 `types/`，禁用易沦为垃圾桶的 `common` 命名），单模块私有辅助代码留在各自模块内，避免顶层与模块内 `infrastructure/` 重名或业务包与技术包混排；模块化单体中 `modules/*` 仅允许经对方 `application` 门面或领域事件协作，禁止穿透对方 `domain`、`infrastructure` 或 `interfaces`，且禁止模块间循环依赖。
 - **四条底线（L1 与 L2 均须遵守）**：
   1. **强类型状态与领域概念**：业务状态与核心识别码使用强类型枚举或值对象，禁止在核心流程中用裸字符串魔法值驱动状态流转。
   2. **语义化异常与协议解耦**：领域层与持久化层只抛出表达业务含义的语义化异常，不出现 HTTP 状态码或协议响应细节；协议映射集中在入口异常处理器完成。
