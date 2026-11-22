@@ -1,3 +1,7 @@
+[agentctl.config-dir]
+value = "~/.config/mxc"
+test_value = "generated/mxc"
+
 [harness.instructions]
 value = ""
 
@@ -23,13 +27,13 @@ value = """## T3 Code
 委派子任务按**「先定模型，再选工具」**决策：
 
 1. **先定模型**：
-   - **前端开发**（含页面实现、UI/原型还原、样式与交互修复）：确认目标仓库和适用规则后，**默认委派给 `deepseek-flash`**。由子 agent 定位代码、实现和验证，主 agent 负责接口协调与验收，不直接代写前端。
-   - **explore（搜索/定位代码/梳理调用关系）**、**简单任务（目标明确、范围小、验收清晰）**：按需委派；委派时默认用 `deepseek-flash`。
-   - **其他子任务**：默认沿用当前模型。
+   - 前端开发（含页面实现、UI/原型还原、样式与交互修复）：确认目标仓库和适用规则后，**默认委派给 `deepseek-flash`**。由子 agent 定位代码、实现和验证，主 agent 负责接口协调与验收，不直接代写前端。
+   - explore（搜索、定位代码、梳理调用关系）与简单任务（目标明确、范围小、验收清晰）：按需委派；委派时默认用 `deepseek-flash`。
+   - 其他子任务：默认沿用当前模型。
 2. **再选工具与角色**：
-   - 目标模型与当前线程一致 → 用当前 harness 原生子 agent 工具（如 OpenCode `subagent`、Claude Code `Agent`、Codex `spawn_agent`）。
-   - 目标模型与当前线程不同（例如 Codex/Sol 派 `deepseek-flash`）→ **必须用 T3 `delegate_task`**（首次前用 `orchestrator_capabilities` 确认可用模型，如 `target.model = "deepseek/deepseek-flash"`）。
-   - **角色与模型同时满足**：命中命名角色（如 `UI Designer`）但需跨模型时，仍走 `delegate_task` 指定目标模型，并在委派提示中要求子 agent 先读取对应角色定义文件（如 `~/.codex/agents/design-ui-designer.toml` 或 `~/.config/opencode/agents/design-ui-designer.md`）；不得为使用原生角色而放弃默认模型。
+   - 目标模型与当前线程一致时，用当前 harness 原生子 agent 工具（如 OpenCode `subagent`、Claude Code `Agent`、Codex `spawn_agent`）。
+   - 目标模型与当前线程不同时（例如 Codex/Sol 派 `deepseek-flash`），**必须用 T3 `delegate_task`**（首次前用 `orchestrator_capabilities` 确认可用模型，如 `target.model = "deepseek/deepseek-flash"`）。
+   - 命中命名角色（如 `UI Designer`）但需跨模型时，仍走 `delegate_task` 指定目标模型，并在委派提示中要求子 agent 先读取对应角色定义文件（如 `~/.codex/agents/design-ui-designer.toml` 或 `~/.config/opencode/agents/design-ui-designer.md`）；不得为使用原生角色而放弃默认模型。
 3. **返工与通信**：
    - 同一任务的后续修改或返工：原生子 agent 优先续接原实例；`delegate_task` 按需携带变更上下文新开委派。
    - 线程间传消息优先走接收方能直接收到的通道（同 harness 走原生；跨 harness 或无原生能力时用 `t3_thread_send`，`mode` 优先 `steer`）。父 agent 需关注回传，必要时用 `t3_thread_read` 读取结果。

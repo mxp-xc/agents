@@ -1,3 +1,3 @@
-[target]
-output = "~/.gemini/GEMINI.md"
-test_output = "generated/antigravity/GEMINI.md"
+[agentctl.target]
+value = "~/.gemini/GEMINI.md"
+test_value = "generated/antigravity/GEMINI.md"

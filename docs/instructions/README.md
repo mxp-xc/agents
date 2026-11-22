@@ -19,15 +19,16 @@ WorkBuddy 桌面端通过内置 CodeBuddy CLI 读取 `~/.workbuddy/CODEBUDDY.md`
 ## 配置与扩展
 
 - `instructions/template.md`：公共 Markdown 模板，使用 `{{ group.key }}` 形式的占位符；不支持 Jinja 表达式或控制语句。
-- `instructions/agents/default.toml`：占位符的默认值；当前 `harness.instructions` 为空字符串，表示没有专属补充。
-- `instructions/agents/<target>.toml`：target 文件名即 CLI 中的名称；`[target].output` 是正式目标路径，`test_output` 是测试路径，其他表提供占位符的值。
+- `instructions/config/`：随指令同步的共享配置目录（如 `references/coding-standards.md`），按目录结构原样镜像同步到 `[agentctl.config-dir]` 指定的根目录，写入时按需自动创建目录；模板中通过 `{{ agentctl.config-dir }}/...` 按需引用。
+- `instructions/agents/default.toml`：占位符默认值与 `[agentctl.config-dir]` 共享目录配置（`value` 为正式路径 `~/.config/mxc`，`test_value` 为测试路径 `generated/mxc`）；当前 `harness.instructions` 为空字符串，表示没有专属补充。
+- `instructions/agents/<target>.toml`：target 文件名即 CLI 中的名称；`[agentctl.target]` 下 `value` 是正式目标路径，`test_value` 是测试路径，其他表提供占位符的值。
 
 例如，在模板放入 `{{ github.tools }}`，在默认配置中提供可选的公共默认值，并在目标配置中覆盖：
 
 ```toml
-[target]
-output = "~/.codex/AGENTS.md"
-test_output = "generated/codex/AGENTS.md"
+[agentctl.target]
+value = "~/.codex/AGENTS.md"
+test_value = "generated/codex/AGENTS.md"
 
 [github.tools]
 value = """
@@ -37,7 +38,7 @@ value = """
 
 渲染时每个 key 优先采用 target 的值，再回退到 default；模板引用的 key 在两处都不存在时报错。空字符串是明确配置的值，不触发回退。default 文件可以不存在，但这时所有 key 都必须由 target 提供。模板未引用的配置 key 会报错。TOML 嵌套表路径以点连接成 key，路径不同但结果相同时报冲突；特殊字符使用 TOML 带引号的表名，例如 `{{ github[field] }}` 对应 `["github[field]"]`。新增占位符时，为所有目标提供相应值或配置默认值，再运行全量检查。新增 harness 时添加一个 TOML 文件并配置不同目标路径，CLI 会自动发现；无需修改生成逻辑。配置项必须是 TOML 字符串，配置文件和模板使用 UTF-8。
 
-相对输出路径相对于项目根目录，支持 `~` 和环境变量展开；使用所在系统的路径语义。正式目标的父目录必须预先存在；测试目标的父目录在写入时自动创建，dry-run 和 check 不创建目录。指定 `--test` 时，所有选中 target 都必须配置 `test_output`，缺少时立即报错，避免意外回退到正式路径。新增 target 时应一并配置测试路径。
+相对输出路径相对于项目根目录，支持 `~` 和环境变量展开；使用所在系统的路径语义。正式目标的父目录必须预先存在；测试目标和 `[agentctl.config-dir]` 的父目录在写入时自动创建，dry-run 和 check 不创建目录。指定 `--test` 时，所有选中 target 的 `[agentctl.target]` 以及已配置的 `[agentctl.config-dir]` 都必须提供 `test_value`，缺少时立即报错，避免意外回退到正式路径。新增 target 时应一并配置测试路径。
 
 ## 日常操作
 
@@ -66,5 +67,3 @@ uv run python -m unittest discover -s tests -v
 3. 检查生成文件及 harness 的实际加载行为，必要时从备份恢复。
 
 本工具不会自动接入启动流程；如有需要，可由用户在确认启动方式和失败处理后自行选择性调用。当前已核查的 Antigravity、Codex、Claude Code、DeepSeek harness、OpenCode 和 WorkBuddy 全局指令路径不由 chezmoi 管理，chezmoi 另管理 OpenCode 配置。若将来选择由 chezmoi 管理生成结果，应先审查 source 和 apply 的覆盖行为并单独确定迁移方案；本工具不会修改 chezmoi。
-
-模板保留的 `@/Users/maoxinchen/.codex/RTK.md` 是原指令中的外部引用，工具不会展开它；迁移到其他机器或 harness 前需确认目标环境及 harness 对该引用的支持。

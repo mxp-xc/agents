@@ -1,9 +1,9 @@
-[target]
-output = "~/.codex/AGENTS.md"
-test_output = "generated/codex/AGENTS.md"
+[agentctl.target]
+value = "~/.codex/AGENTS.md"
+test_value = "generated/codex/AGENTS.md"
 
 [github.tools]
-value = "- 处理 GitHub 任务时，优先调用 `github` 技能库工具，不可用时回退至 `gh` CLI。"
+value = "\n- 处理 GitHub 任务时，优先调用 `github` 技能库工具，不可用时回退至 `gh` CLI。"
 
 # 值开头的 \n 补齐模板中省去的空行，使 codex 在标题与列表之间保留空行；其余 target 值为空时不产生多余空行。
 [rtk.instructions]

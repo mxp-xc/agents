@@ -1,4 +1,3 @@
-import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -23,9 +22,9 @@ class InstructionsTest(unittest.TestCase):
             '[github.tools]\nvalue = "默认工具"\n[harness.instructions]\nvalue = ""\n', encoding="utf-8"
         )
         (self.config / "codex.toml").write_text(
-            '[target]\noutput = "out/codex.md"\n[harness.instructions]\nvalue = "Codex 专属"\n', encoding="utf-8"
+            '[agentctl.target]\nvalue = "out/codex.md"\n[harness.instructions]\nvalue = "Codex 专属"\n', encoding="utf-8"
         )
-        (self.config / "claude.toml").write_text('[target]\noutput = "out/claude.md"\n', encoding="utf-8")
+        (self.config / "claude.toml").write_text('[agentctl.target]\nvalue = "out/claude.md"\n', encoding="utf-8")
         self.runner = CliRunner()
 
     def run_cli(self, *args):
@@ -92,7 +91,7 @@ class InstructionsTest(unittest.TestCase):
         (self.config / "default.toml").write_text(
             '["github[field]"]\nvalue = "first"\n["github.tools | upper"]\nvalue = "second"\n', encoding="utf-8"
         )
-        (self.config / "codex.toml").write_text('[target]\noutput = "out/codex.md"\n', encoding="utf-8")
+        (self.config / "codex.toml").write_text('[agentctl.target]\nvalue = "out/codex.md"\n', encoding="utf-8")
         result = self.run_cli("sync", "codex")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertEqual(
@@ -135,9 +134,9 @@ class InstructionsTest(unittest.TestCase):
         self.assertEqual(original.read_text(), "原始内容")
 
     def test_duplicate_paths_and_missing_directory(self):
-        (self.config / "claude.toml").write_text('[target]\noutput = "out/codex.md"\n', encoding="utf-8")
+        (self.config / "claude.toml").write_text('[agentctl.target]\nvalue = "out/codex.md"\n', encoding="utf-8")
         self.assertIn("冲突", self.run_cli("sync").output)
-        (self.config / "claude.toml").write_text('[target]\noutput = "missing/file.md"\n', encoding="utf-8")
+        (self.config / "claude.toml").write_text('[agentctl.target]\nvalue = "missing/file.md"\n', encoding="utf-8")
         self.assertIn("目录不存在", self.run_cli("sync").output)
 
     def test_write_failure_reports_partial_success(self):
@@ -162,11 +161,14 @@ class InstructionsTest(unittest.TestCase):
         self.assertEqual(self.run_cli("sync", "codex").exit_code, 2)
         self.assertTrue(lock.exists())
 
-    def test_test_output_uses_target_config_and_never_falls_back(self):
+    def test_test_value_uses_target_config_and_never_falls_back(self):
         test_dir = self.root / "test-output"
         test_dir.mkdir()
         config = self.config / "codex.toml"
-        config.write_text(config.read_text().replace('output = "out/codex.md"', 'output = "out/codex.md"\ntest_output = "test-output/codex.md"'), encoding="utf-8")
+        config.write_text(
+            config.read_text().replace('value = "out/codex.md"', 'value = "out/codex.md"\ntest_value = "test-output/codex.md"'),
+            encoding="utf-8",
+        )
         result = self.run_cli("sync", "codex", "--test")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertTrue((test_dir / "codex.md").exists())
@@ -174,17 +176,80 @@ class InstructionsTest(unittest.TestCase):
         self.assertEqual(self.run_cli("check", "codex", "--test").exit_code, 0)
         result = self.run_cli("sync", "--test")
         self.assertEqual(result.exit_code, 2)
-        self.assertIn("缺少测试输出路径", result.output)
+        self.assertIn("缺少测试路径", result.output)
         self.assertFalse((self.root / "out" / "claude.md").exists())
 
-    def test_test_output_parent_created_only_when_writing(self):
+    def test_test_value_parent_created_only_when_writing(self):
         config = self.config / "codex.toml"
-        config.write_text(config.read_text().replace('output = "out/codex.md"', 'output = "out/codex.md"\ntest_output = "new/nested/codex.md"'), encoding="utf-8")
+        config.write_text(
+            config.read_text().replace('value = "out/codex.md"', 'value = "out/codex.md"\ntest_value = "new/nested/codex.md"'),
+            encoding="utf-8",
+        )
         self.assertEqual(self.run_cli("sync", "codex", "--test", "--dry-run").exit_code, 0)
         self.assertFalse((self.root / "new").exists())
         result = self.run_cli("sync", "codex", "--test")
         self.assertEqual(result.exit_code, 0, result.output)
         self.assertTrue((self.root / "new" / "nested" / "codex.md").exists())
+
+    def test_config_dir_sync_check_and_placeholder(self):
+        refs = self.root / "instructions" / "config" / "references"
+        refs.mkdir(parents=True)
+        (refs / "coding.md").write_text("# 编码规范\n", encoding="utf-8")
+        self.template.write_text(
+            "# 公共\n\n读取 `{{ agentctl.config-dir }}/references/coding.md`\n{{ github.tools }}\n{{ harness.instructions }}\n",
+            encoding="utf-8",
+        )
+        (self.config / "default.toml").write_text(
+            '[agentctl.config-dir]\nvalue = "shared/mxc"\ntest_value = "test-mxc"\n'
+            '[github.tools]\nvalue = "默认工具"\n[harness.instructions]\nvalue = ""\n',
+            encoding="utf-8",
+        )
+        config = self.config / "codex.toml"
+        config.write_text(
+            config.read_text().replace('value = "out/codex.md"', 'value = "out/codex.md"\ntest_value = "test-out/codex.md"'),
+            encoding="utf-8",
+        )
+        self.assertEqual(self.run_cli("sync", "codex", "--dry-run").exit_code, 0)
+        self.assertFalse((self.root / "shared").exists())
+        result = self.run_cli("sync", "codex")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("读取 `shared/mxc/references/coding.md`", (self.root / "out" / "codex.md").read_text(encoding="utf-8"))
+        self.assertEqual((self.root / "shared" / "mxc" / "references" / "coding.md").read_text(encoding="utf-8"), "# 编码规范\n")
+        self.assertEqual(self.run_cli("check", "codex").exit_code, 0)
+        result = self.run_cli("sync", "codex", "--test")
+        self.assertEqual(result.exit_code, 0, result.output)
+        self.assertIn("读取 `test-mxc/references/coding.md`", (self.root / "test-out" / "codex.md").read_text(encoding="utf-8"))
+        self.assertEqual((self.root / "test-mxc" / "references" / "coding.md").read_text(encoding="utf-8"), "# 编码规范\n")
+        self.assertEqual(self.run_cli("check", "codex", "--test").exit_code, 0)
+
+    def test_config_dir_missing_config_or_test_value(self):
+        refs = self.root / "instructions" / "config" / "references"
+        refs.mkdir(parents=True)
+        (refs / "coding.md").write_text("# 编码规范\n", encoding="utf-8")
+        result = self.run_cli("sync", "codex")
+        self.assertEqual(result.exit_code, 2)
+        self.assertIn("未配置 [agentctl.config-dir]", result.output)
+        (self.config / "default.toml").write_text(
+            '[agentctl.config-dir]\nvalue = "shared/mxc"\n[github.tools]\nvalue = "默认工具"\n[harness.instructions]\nvalue = ""\n',
+            encoding="utf-8",
+        )
+        config = self.config / "codex.toml"
+        config.write_text(
+            config.read_text().replace('value = "out/codex.md"', 'value = "out/codex.md"\ntest_value = "test-out/codex.md"'),
+            encoding="utf-8",
+        )
+        result = self.run_cli("sync", "codex", "--test")
+        self.assertEqual(result.exit_code, 2)
+        self.assertIn("缺少测试路径", result.output)
+
+    def test_unknown_control_key_rejected(self):
+        (self.config / "default.toml").write_text(
+            '[agentctl.unknown]\nvalue = "x"\n[github.tools]\nvalue = "默认工具"\n[harness.instructions]\nvalue = ""\n',
+            encoding="utf-8",
+        )
+        result = self.run_cli("sync", "codex")
+        self.assertEqual(result.exit_code, 2)
+        self.assertIn("未知配置: unknown", result.output)
 
 
 if __name__ == "__main__":
