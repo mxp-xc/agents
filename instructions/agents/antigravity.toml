@@ -1,0 +1,3 @@
+[target]
+output = "~/.gemini/GEMINI.md"
+test_output = "generated/antigravity/GEMINI.md"

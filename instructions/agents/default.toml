@@ -20,20 +20,19 @@ value = """## T3 Code
 
 ### 任务委派
 
-子任务默认用当前 harness 的原生子 agent 工具派发（如 OpenCode 的 `subagent`、Claude Code 的 `Agent`、Codex 的 `spawn_agent`）。
+委派子任务按**「先定模型，再选工具」**决策：
 
-仅当需要派遣到其他 harness、不同 provider 或不同模型时，才用 T3 的 `delegate_task`；首次委派前用 `orchestrator_capabilities` 确认当前环境中 provider 与模型可用。例如 codex/sol 线程要派 `deepseek-flash` 子任务：`delegate_task` 传 `target.model = "deepseek/deepseek-flash"`。
-
-`delegate_task` 无法直接指定命名子 agent 时，在委派提示中引用对应 Harness 的角色定义文件，要求子 agent 先读取并遵循；如 OpenCode 的 `ui-designer` 对应 `~/.config/opencode/agents/design-ui-designer.md`。
-
-以下场景按需派发子 agent，默认使用 `deepseek-flash`：
-
-1. explore 类型任务（搜索、定位代码、梳理调用关系），按需委派。
-2. 简单任务（目标明确、范围小、验收清晰），按需委派。
-3. 前端开发任务，确认目标仓库和适用规则后直接委派。由子 agent 定位代码、实现和验证，主 agent 负责验收。
-   - 同一任务的后续修改、补充或返工，优先交给原子 agent 继续处理。独立任务或原子 agent 无法续接时，新开委派。
-
-线程间传消息用接收方能直接收到的通道：同一 harness 优先走原生子 agent 机制，例如codex 发给 codex 直接用原生；当前 harness 没有原生子 agent 能力，或跨 harness 发送（例如codex 发给 claude），才用 `t3_thread_send` 传目标线程的 `threadId`，`mode` 优先 `steer` 打断正在执行的一轮；`queue` 排队等下一轮，父 agent 长时间运行时可能一直收不到。父 agent 要主动用 `t3_thread_read` 收取子 agent 回传，不要只等自动送达。
+1. **先定模型**：
+   - **前端开发**（含页面实现、UI/原型还原、样式与交互修复）：确认目标仓库和适用规则后，**默认委派给 `deepseek-flash`**。由子 agent 定位代码、实现和验证，主 agent 负责接口协调与验收，不直接代写前端。
+   - **explore（搜索/定位代码/梳理调用关系）**、**简单任务（目标明确、范围小、验收清晰）**：按需委派；委派时默认用 `deepseek-flash`。
+   - **其他子任务**：默认沿用当前模型。
+2. **再选工具与角色**：
+   - 目标模型与当前线程一致 → 用当前 harness 原生子 agent 工具（如 OpenCode `subagent`、Claude Code `Agent`、Codex `spawn_agent`）。
+   - 目标模型与当前线程不同（例如 Codex/Sol 派 `deepseek-flash`）→ **必须用 T3 `delegate_task`**（首次前用 `orchestrator_capabilities` 确认可用模型，如 `target.model = "deepseek/deepseek-flash"`）。
+   - **角色与模型同时满足**：命中命名角色（如 `UI Designer`）但需跨模型时，仍走 `delegate_task` 指定目标模型，并在委派提示中要求子 agent 先读取对应角色定义文件（如 `~/.codex/agents/design-ui-designer.toml` 或 `~/.config/opencode/agents/design-ui-designer.md`）；不得为使用原生角色而放弃默认模型。
+3. **返工与通信**：
+   - 同一任务的后续修改或返工：原生子 agent 优先续接原实例；`delegate_task` 按需携带变更上下文新开委派。
+   - 线程间传消息优先走接收方能直接收到的通道（同 harness 走原生；跨 harness 或无原生能力时用 `t3_thread_send`，`mode` 优先 `steer`）。父 agent 需关注回传，必要时用 `t3_thread_read` 读取结果。
 
 ### 跨线程回复
 
