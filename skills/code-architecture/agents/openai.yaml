@@ -1,0 +1,7 @@
+interface:
+  display_name: "Code Architecture"
+  short_description: "Bootstrap pragmatic code architecture, coding standards, and automated guardrails"
+  default_prompt: "Use $code-architecture to establish pragmatic code architecture boundaries, generate docs/CODING_STANDARDS.md, wire automated architecture guardrails, and build a walking skeleton."
+
+policy:
+  allow_implicit_invocation: true
