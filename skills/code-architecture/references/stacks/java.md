@@ -1,6 +1,6 @@
 # Java + Spring Boot 务实 DDD 落地方案
 
-适用于 JDK 17/21 + Spring Boot 3/4 服务。默认采用**模块化单体（`modules/` 收拢业务域 + 根包展平横切）+ 模块内四层**的 **L1 轻量务实 DDD**（四层细则见 [ddd-guide.md](../ddd-guide.md)，通用底线见 [architecture-principles.md](../architecture-principles.md)）。
+适用于现代 JDK + Spring Boot 服务（默认选用最新 LTS / 稳定版）。默认采用**模块化单体（`modules/` 收拢业务域 + 根包展平横切）+ 模块内四层**的 **L1 轻量务实 DDD**（四层细则见 [ddd-guide.md](../ddd-guide.md)，通用底线见 [architecture-principles.md](../architecture-principles.md)）。
 
 ## 一、包骨架与依赖边界
 

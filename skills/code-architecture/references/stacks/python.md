@@ -16,7 +16,7 @@ project/
 │   │   ├── router.py            # 聚合各业务子路由（由 main.py 注入 service 实例，api 零 db 导入）
 │   │   ├── deps.py              # 集中鉴权、当前操作者依赖注入
 │   │   └── routes/              # 按业务资源拆文件（orders.py, risk.py）
-│   ├── schemas/                 # 【契约层】Pydantic v2 请求与响应业务数据 Schema（带 Field 描述）
+│   ├── schemas/                 # 【契约层】Pydantic 请求与响应业务数据 Schema（带 Field 描述）
 │   ├── services/                # 【业务逻辑与用例层】按业务资源拆文件（orders.py, risk.py）
 │   │                            # 负责事务边界、状态流转与业务校验（失败抛 BusinessException(XxxErrorCode)）
 │   ├── repositories/            # 【数据访问层】按业务资源拆文件，封装 SQLAlchemy/SQLModel 查询
@@ -153,20 +153,17 @@ class RiskErrorCode(ErrorCode):
 | **契约与表模型** | `schemas/`（Pydantic）与 `db/models/`（ORM）严格分文件；路由显式返回 `ApiResponse[OrderSchema]` | 路由直接裸返 ORM Model 实例，或把 `trace_id` 塞进 `ApiResponse.data` |
 | **状态与公共目录** | 状态用 `StrEnum`；跨模块纯类型放 `types/`、工具放 `utils/` | 散落裸字符串状态比较；或建 `common/` 目录把单业务私有函数丢进全局 |
 
+### 默认选型与框架细则
+
+- **默认技术栈**：各依赖均采用最新稳定版。Web 用 `FastAPI`，校验用 `Pydantic`，ORM 用 `SQLAlchemy` + `Alembic`，HTTP 客户端优先 `httpx2`（替代停更的 `httpx`，与依赖树中的 `httpx` 可共存；需 HTTP/2 时装 `httpx2[http2]`），包管理用 `uv`，测试用 `pytest`。
+- **Pydantic**：使用现代 API（`BaseModel`、`model_config = ConfigDict(from_attributes=True)`、`model_validator`、`Field(description=...)`），不引入过时写法（`orm_mode`、`@validator`）。
+- **SQLAlchemy 与 Alembic**：基类继承 `DeclarativeBase`，列用 `Mapped[T]` 与 `mapped_column`；关系显式声明 `cascade`/`lazy`，防循环触发默认 `lazy="select"` N+1（用 `selectinload`/`joinedload`）；`Alembic` 基于 `Base.metadata` 执行 `revision --autogenerate`，人工核对 diff 并补齐 `downgrade` 后再 `upgrade head`。
+
 ## 四、机械护栏：import-linter + ruff + pyrefly
 
-Python 项目不强制限制函数 `max-args`（FastAPI 依赖注入与关键字参数天然较多），默认使用 **`import-linter`**（分层依赖护栏）+ **`ruff`**（静态规范、格式与模块/类/函数 docstring 检查）+ **`pyrefly`**（类型检查）。在 `pyproject.toml` 写入以下配置：
+Python 项目不强制限制函数 `max-args`（FastAPI 依赖注入与关键字参数天然较多），默认使用 **`import-linter`**（分层依赖护栏）+ **`ruff`**（静态规范、格式与模块/类/函数 docstring 检查）+ **`pyrefly`**（类型检查）。通过 `uv add --group dev import-linter pre-commit pyrefly pytest ruff` 安装最新稳定版，并在 `pyproject.toml` 写入以下配置：
 
 ```toml
-[dependency-groups]
-dev = [
-    "import-linter>=2.1,<3",
-    "pre-commit>=4.7,<5",
-    "pyrefly>=1.4.1",
-    "pytest>=8.3,<10",
-    "ruff>=0.17.4",
-]
-
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F"]
 extend-select = ["D100", "D101", "D102", "D103", "D104"]

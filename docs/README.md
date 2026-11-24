@@ -15,5 +15,4 @@
 - [Skill 通用维护约定](skills/README.md)：所有 skill 的独立分发与资源引用边界。
 - [refactor-advisor](skills/refactor-advisor.md)：领域与公共资源的划分、引用方向、扩展边界和验证要求。
 - [orchestrate-development](skills/orchestrate-development.md)：开发协调流程、正式版本与草案的维护边界、实现入口和验证要求。
-- [project-structure](skills/project-structure.md)：项目结构指导的维护边界、参考文件职责与扩展方式。
 - [code-architecture](skills/code-architecture.md)：务实代码架构与 DDD 起手、未上线整改与自动化护栏技能的维护边界与扩展方式。

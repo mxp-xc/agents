@@ -15,7 +15,7 @@
  │    └── 选定 极简平铺 / 轻量务实分层 ──▶ 跳过 ddd-guide.md
  │
  ├── 3. 技术栈特化（位于 stacks/ 子目录，按仓库实际语言加载）
- │    ├── Java 17/21 + Spring Boot ──────▶ stacks/java.md
+ │    ├── Java / Spring Boot ────────────▶ stacks/java.md
  │    ├── Python / FastAPI / CLI ────────▶ stacks/python.md
  │    └── TypeScript (React / Node) ─────▶ stacks/typescript-web.md
  │

@@ -7,7 +7,7 @@
 ## 能力定位
 
 - **自主触发（model-invoked）**：面向新建项目、新增独立业务模块、未上线早期代码结构整理，以及既有系统补齐规范与架构护栏的场景；不设置 `disable-model-invocation: true`。
-- **与 `project-structure` 的边界**：`project-structure` 聚焦目录骨架与文件摆放（用户手动触发）；`code-architecture` 负责分层边界、技术栈关键选型拍板、落盘 `docs/CODING_STANDARDS.md`、接入自动化架构护栏（ArchUnit / ESLint + dependency-cruiser / import-linter）并交付标杆垂直切片。
+- **职责范围**：覆盖目录骨架与分层边界、技术栈关键选型、落盘 `docs/CODING_STANDARDS.md`、接入自动化架构护栏（ArchUnit / ESLint + dependency-cruiser / import-linter）并交付标杆垂直切片。
 
 ## 目录职责与单一事实源
 
@@ -19,7 +19,7 @@
 | [references/ddd-guide.md](../../skills/code-architecture/references/ddd-guide.md) | `modules/*` 拆分 4 判据、四层内部结构与代码形态对比、跨模块事务与查询协作、L1 vs L2 裁剪矩阵、假 DDD 反模式排雷 |
 | [references/coding-standards-template.md](../../skills/code-architecture/references/coding-standards-template.md) | 落盘至目标仓库 `docs/CODING_STANDARDS.md` 的规范模板 |
 | [references/stacks/java.md](../../skills/code-architecture/references/stacks/java.md) | Java/Spring Boot 目录树、运行时调用树、5 项起手选型、正反模式 diff、ArchUnit 护栏测试 |
-| [references/stacks/python.md](../../skills/code-architecture/references/stacks/python.md) | Python/FastAPI 轻量展平目录树、依赖与调用树、统一响应与 `BusinessException` 模板、`import-linter` + `ruff` + `pyrefly` 配置 |
+| [references/stacks/python.md](../../skills/code-architecture/references/stacks/python.md) | Python/FastAPI 轻量展平目录树、依赖与调用树、统一响应与 `BusinessException` 模板、默认选型与框架细则、`import-linter` + `ruff` + `pyrefly` 配置 |
 | [references/stacks/typescript-web.md](../../skills/code-architecture/references/stacks/typescript-web.md) | 前端 `app/features/shared` 组件调用链、Node 后端 `modules/` + 展平横切树、ESLint + `dependency-cruiser` 护栏 |
 | [agents/openai.yaml](../../skills/code-architecture/agents/openai.yaml) | 展示名称、简述、默认提示词与 `allow_implicit_invocation: true` 策略 |
 
