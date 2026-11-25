@@ -46,8 +46,9 @@
 
 ## 浏览器
 
-- 浏览器命令必须指定 session：`opencli browser <session>` 用位置参数，`playwright-cli open` 用 `-s`。默认命名为 `{task}-{uuid}`（`uuid` 用 `uv run python -c "import uuid; print(uuid.uuid4().hex[:8])"` 生成），同一任务复用；共享 session 用能说明用途的固定名称；用户指定名称时按用户要求。
-- 不自行安装浏览器，不得通过 `npx playwright install`、`puppeteer` 等工具绕过。
+- 浏览器操作优先使用 OpenCLI，执行 `opencli browser <session>` 时必须指定 session：默认命名为 `{task}-{uuid}`（`uuid` 用 `uv run python -c "import uuid; print(uuid.uuid4().hex[:8])"` 生成），同一任务复用；共享 session 用能说明用途的固定名称；用户指定名称时按用户要求。
+- 仅操作和清理自己新建的 session 与标签页，避免干扰用户现有页面。
+- 禁止自行安装浏览器（如 `npx playwright install`、`puppeteer`）。
 
 {{ t3.instructions }}
 

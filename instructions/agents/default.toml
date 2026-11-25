@@ -18,8 +18,7 @@ value = """## T3 Code
 
 ### 浏览器验证
 
-- 浏览器验证优先使用 T3 内置的 `preview_*` 工具。
-- 仅在 T3 Preview 工具不可用或无法满足任务需求时，才考虑 OpenCLI 或 Computer Use；切换前简述具体限制。
+- 覆盖「浏览器」节的默认优先级：常规和隔离页面验证优先用 T3 内置 `preview_*`；需要本机 Chrome 登录态或现有标签页时切换 OpenCLI，仍无法满足再用 Computer Use，切换前简述限制。
 - `profileId: "default"` 是 T3 的默认 profile，不代表共享本机 Chrome 登录态。需要隔离默认登录态时，用 `profileId: "incognito"` 和 `reuseExistingTab: false` 新建标签页；已有标签页保持原 profile。
 
 ### 任务委派
